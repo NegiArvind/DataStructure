@@ -1,9 +1,8 @@
 #include<bits/stdc++.h>
 using namespace std;
 typedef struct job{
-	int rt,adl,remainingTime;
+	int rt,adl,remainingTime,slackTime;
 }JOB;
-
 struct task{
 	int rt,ct,tp,dl,noOfjob,k,taskNumber;
 	JOB job[100];
@@ -13,16 +12,17 @@ typedef struct task TASK;
 struct Compare{
 	bool operator()(const TASK* task1,const TASK* task2)
     {
-	   return task1->job[task1->k].adl>task2->job[task2->k].adl;
+	   return task1->job[task1->k].slackTime>task2->job[task2->k].slackTime;
     }
 };
 
 int main(){
 
 	stack<TASK> stack;
-	// Compare is used to insert data into priorityqueue in increasing order of absolute deadline
+	// Compare is used to insert data into priorityqueue in increasing order of slack time of a job
 	priority_queue<TASK*,vector<TASK*>,Compare> pQueue;
 	int n,i,j;
+	cout<<" Least Slack Time Algorithm \n";
 	cout<<"enter no. of task\n";
 	cin>>n;
 	TASK task[n];
@@ -58,6 +58,7 @@ int main(){
 		task[i].noOfjob=j;
 	}
 	cout<<"Hyperperiod= "<<hyperPeriod<<" \n";
+
 	for(i=0;i<hyperPeriod;)
 	{
 	    for(j=0;j<n;j++)
@@ -66,7 +67,10 @@ int main(){
 	    	if(task[j].job[task[j].k].rt==i)
 	    	{
 	    		if(task[j].k<task[j].noOfjob)
-	    		pQueue.push(&task[j]);
+	    		{
+	    			task[j].job[task[j].k].slackTime=task[j].job[task[j].k].adl-i-task[j].job[task[j].k].remainingTime;
+                    pQueue.push(&task[j]);
+	    		}
 	    	}
 	    }
 
@@ -89,17 +93,17 @@ int main(){
 	        }
 	    }
 	    else
-	    	i++;    
+	    	i++;
 	}
 	cout<<"\n\n";
 	for(int i=0;i<n;i++){
 		if(task[i].k==task[i].noOfjob){
-			cout<<"All jobs of task "<<i+1<<" has been scheduled \n";
+			cout<<"All jobs of Task "<<i+1<<" has been scheduled \n";
 		}else{
-			cout<<"jobs of task "<<i+1<<" ";
-			// cout<<task[i].k+1<<task[i].noOfjob<<" ";
+			cout<<"Jobs of Task "<<i+1<<" ";
+			//cout<<task[i].k+1<<task[i].noOfjob<<" ";
 			for(int j=task[i].k+1;j<=task[i].noOfjob;j++){
-				cout<<"J"<<i<<j<<" ";
+				cout<<"J"<<i+1<<j<<" ";
 			}
 			cout<<"could not be scheduled\n";
 		}
